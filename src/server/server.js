@@ -12,11 +12,21 @@ import serverRoutes from '../frontend/routes/serverRoutes';
 import initialState from '../frontend/initialState';
 import reducer from '../frontend/reducers';
 import getManifest from './getManifest';
-import App from '../frontend/routes/App';
+import cookieParser from 'cookie-parser';
+import boom from '@hapi/boom';
+import passport from 'passport';
+import axios from 'axios';
 
 const { ENV, PORT } = process.env;
 
 const app = express();
+
+app.use(express.json());
+app.use(cookieParser());
+app.use(passport.initialize());
+app.use(passport.session());
+
+require('./utils/auth/strategies/basic.js')
 
 if (ENV === 'development') {
   console.log('Development config');
@@ -81,6 +91,64 @@ const renderApp = (req, res) => {
 }
 
 app.get('*', renderApp);
+
+app.post("/auth/sign-in", async function(req, res, next) {
+  // Obtenemos el atributo rememberMe desde el cuerpo del request
+  const { rememberMe } = req.body;
+  // console.log(req.cookies);
+  passport.authenticate("basic", function(error, data) {
+    try {
+      if (error || !data) {
+        return next(boom.unauthorized("Error la data viene vacía :("));
+      }
+
+      req.login(data, { session: false }, async function(error) {
+        if (error) {
+          next(error);
+        }
+
+        const { token, ...user } = data;
+
+        // Si el atributo rememberMe es verdadero la expiración será en 30 dias
+        // de lo contrario la expiración será en 2 horas
+        // res.cookie("token", token, {
+        //   httpOnly: !config.dev,
+        //   secure: !config.dev,
+        //   maxAge: rememberMe ? THIRTY_DAYS_IN_SEC : TWO_HOURS_IN_SEC
+        // });
+
+        if (!config.dev) {
+          res.cookie("token", token, {
+            httpOnly: true,
+            secure: true,
+          });
+        } else {
+            res.cookie("token", token);
+        }
+
+        res.status(200).json(user);
+      });
+    } catch (error) {
+      next(error);
+    }
+  })(req, res, next);
+});
+
+app.post("/auth/sign-up", async function(req, res, next) {
+  const { body: user } = req;
+
+  try {
+    await axios({
+      url: `${config.apiUrl}/api/auth/sign-up`,
+      method: "post",
+      data: user
+    });
+
+    res.status(201).json({ message: "user created" });
+  } catch (error) {
+    next(error);
+  }
+});
 
 app.listen(PORT, (err) => {
   if (err) console.log(err);
