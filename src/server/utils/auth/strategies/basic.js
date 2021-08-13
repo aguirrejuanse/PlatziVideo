@@ -8,30 +8,30 @@ require('dotenv').config;
 
 // definimos nuestra nueva estrategia
 passport.use(
-  new BasicStrategy(async function (email, password, cb) {
+  new BasicStrategy(async (email, password, cb) => {
     try {
 
       const { data, status } = await axios({
         url: `${process.env.API_URL}/api/auth/sign-in`,
-        method: "post",
+        method: 'post',
         auth: {
           password,
-          username: email
+          username: email,
         },
         data: {
-          apiKeyToken: process.env.API_KEY_TOKEN
-        }
+          apiKeyToken: process.env.API_KEY_TOKEN,
+        },
       });
-      
       if (!data || status !== 200) {
-        return cb(boom.unauthorized("Fallo aquí chavos", false));
+        return cb(boom.unauthorized('Fallo aquí chavos', false));
       }
 
       // la es respuesta es el token y la info del usuario
+      console.log('basic', data);
       return cb(null, data);
 
     } catch (error) {
-      cb(error);
+      return cb(error);
     }
-  })
+  }),
 );
