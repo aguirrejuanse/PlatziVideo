@@ -4,7 +4,6 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CompressionWebpackPlugin = require('compression-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
-const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const ESLintPlugin = require('eslint-webpack-plugin');
 
 require('dotenv').config();
@@ -93,10 +92,6 @@ module.exports = {
       }),
     isDev ? () => {} :
       new WebpackManifestPlugin(),
-    isDev ? () => {} :
-      new CleanWebpackPlugin({
-        cleanOnceBeforeBuildPatterns: path.resolve(__dirname, 'src/server/public'),
-      }),
     isDev ? new ESLintPlugin() :
       () => {},
     new MiniCssExtractPlugin({
