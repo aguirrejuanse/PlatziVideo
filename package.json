@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "src/server/index",
+  "engines": {
+    "node": "12.16.x"
+  },
   "scripts": {
     "build": "webpack-cli --config webpack.config",
     "lint": "eslint src/frontend/ --ext .js --ext .jsx --fix",
