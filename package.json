@@ -2,11 +2,11 @@
   "name": "platzivideo",
   "version": "1.0.0",
   "description": "",
-  "main": "src/server/index.js",
+  "main": "src/server/index",
   "scripts": {
     "build": "webpack-cli --config webpack.config",
     "lint": "eslint src/frontend/ --ext .js --ext .jsx --fix",
-    "start": "nodemon src/server/index.js",
+    "start": "nodemon src/server/index",
     "start:dev": "nodemon src/server/index",
     "test": "jest",
     "test:watch": "jest --watch",
