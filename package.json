@@ -29,6 +29,7 @@
     "asset-require-hook": "^1.2.0",
     "axios": "^0.21.1",
     "classnames": "^2.3.1",
+    "clean-webpack-plugin": "^4.0.0-alpha.0",
     "compression-webpack-plugin": "^8.0.1",
     "cookie-parser": "^1.4.5",
     "dotenv": "^10.0.0",

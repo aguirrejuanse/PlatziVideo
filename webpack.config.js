@@ -4,6 +4,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CompressionWebpackPlugin = require('compression-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const ESLintPlugin = require('eslint-webpack-plugin');
 
 require('dotenv').config();
@@ -20,7 +21,7 @@ module.exports = {
   mode: process.env.ENV,
   output: {
     path: path.resolve(__dirname, 'src/server/public'),
-    filename: isDev ? 'assets/app.js' : 'assets/app-[hash].js',
+    filename: isDev ? 'assets/app.js' : 'assets/app-[contenthash].js',
     publicPath: '/',
   },
   resolve: {
@@ -37,7 +38,7 @@ module.exports = {
           chunks: 'all',
           reuseExistingChunk: true,
           priority: 1,
-          filename: isDev ? 'assets/vendor.js' : 'assets/vendor-[hash].js',
+          filename: isDev ? 'assets/vendor.js' : 'assets/vendor-[contenthash].js',
           enforce: true,
           test(module, chunks) {
             const name = module.nameForCondition && module.nameForCondition();
@@ -72,7 +73,7 @@ module.exports = {
           {
             loader: 'file-loader',
             options: {
-              name: 'assets/[hash].[ext]',
+              name: 'assets/[contenthash].[ext]',
             },
           },
         ],
@@ -88,14 +89,18 @@ module.exports = {
     isDev ? () => {} :
       new CompressionWebpackPlugin({
         test: /\.js$|\.css$/,
-        filename: '[path].gz',
+        filename: '[path][base].gz',
       }),
     isDev ? () => {} :
       new WebpackManifestPlugin(),
     isDev ? new ESLintPlugin() :
       () => {},
+    isDev ? () => {} :
+      new CleanWebpackPlugin({
+        cleanOnceBeforeBuildPatterns: path.resolve(__dirname, 'src/server/public'),
+      }),
     new MiniCssExtractPlugin({
-      filename: isDev ? 'assets/app.css' : 'assets/app-[hash].css',
+      filename: isDev ? 'assets/app.css' : 'assets/app-[contenthash].css',
     }),
   ],
 };
